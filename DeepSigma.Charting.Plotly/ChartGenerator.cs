@@ -28,7 +28,7 @@ public class ChartGenerator
         foreach (IChartSeriesAbstract series in all_series)
         {
             List<XYData> data = series.Data.GetAllDataPoints().Select(x => (XYData)x).ToList();
-            GenericChart chart_result = GetDataSeriesChart((ChartDataSeries)series);
+            GenericChart chart_result = GetChart(series);
             traces.Add(chart_result);
             //CSharp.Chart.Line<double, double, string>(
             //   x: ,
@@ -60,6 +60,17 @@ public class ChartGenerator
         });
     }
 
+    private static GenericChart GetChart(IChartSeriesAbstract chart)
+    {
+        return chart switch
+        {
+            ChartDataSeries => GetDataSeriesChart((ChartDataSeries)chart, true),
+            ChartFinancialSeries => GetFinancialSeriesChart((ChartFinancialSeries)chart),
+            _ => throw new NotImplementedException()
+        };
+
+    }
+
     private static GenericChart GetDataSeriesChart(ChartDataSeries chart, bool IncludeMarkers = true)
     {
         List<XYData> data = chart.Data.GetAllDataPoints().Cast<XYData>().ToList();
@@ -73,6 +84,22 @@ public class ChartGenerator
             DataSeriesChartType.Area => CSharp.Chart.Area<double, double, string>(X, Y, Name: chart.SeriesName, ShowMarkers: IncludeMarkers),
             DataSeriesChartType.Scatter => CSharp.Chart.Scatter<double, double, string>(X, Y, StyleParam.Mode.Markers, Name: chart.SeriesName),
             DataSeriesChartType.Histogram => CSharp.Chart.Column<double, double, string>(Y, Keys: new (X, true), Name: chart.SeriesName),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private static GenericChart GetFinancialSeriesChart(ChartFinancialSeries chart)
+    {
+        List<CandleData> data = chart.Data.GetAllDataPoints().Cast<CandleData>().ToList();
+        List<DateTime> DateTimes = data.Select(x => x.TimeStamp).ToList();
+        List<decimal> Open = data.Select(x => x.Open).ToList();
+        List<decimal> High = data.Select(x => x.High).ToList();
+        List<decimal> Low = data.Select(x => x.Low).ToList();
+        List<decimal> Close = data.Select(x => x.Close).ToList();
+
+        return chart.ChartType switch
+        {
+            FinancialSeriesChartType.CandleStick => CSharp.Chart.Candlestick<decimal, DateTime, string>(Open, High, Low, Close, DateTimes, Name: chart.SeriesName, ShowLegend: true),
             _ => throw new NotImplementedException()
         };
     }

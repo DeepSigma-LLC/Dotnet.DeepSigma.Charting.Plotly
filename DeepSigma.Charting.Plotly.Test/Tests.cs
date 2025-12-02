@@ -23,7 +23,7 @@ public class Tests
         data.Add(new Models.XYData(3, 1500));
         data.Add(new Models.XYData(4, 1434));
 
-        ChartSeriesAbstract chart_series = new ChartDataSeries() { ChartType = Enum.DataSeriesChartType.Histogram, SeriesName = "SPX", Data = data };
+        ChartSeriesAbstract chart_series = new ChartDataSeries() { ChartType = Enum.DataSeriesChartType.Line, SeriesName = "SPX", Data = data };
         chart.Series.Add(chart_series);
 
         DataSeries<IDataModel> data2 = new();
