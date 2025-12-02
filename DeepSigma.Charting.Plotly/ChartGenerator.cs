@@ -19,6 +19,10 @@ namespace DeepSigma.Charting.Plotl;
 public class ChartGenerator
 {
 
+    /// <summary>
+    /// Creates and displays a chart based on the provided Chart2D configuration.
+    /// </summary>
+    /// <param name="chart_config"></param>
     public static void Create(Charting.Chart2D chart_config)
     {
         List<IChartSeriesAbstract> all_series = chart_config.Series;
@@ -30,12 +34,6 @@ public class ChartGenerator
             List<XYData> data = series.Data.GetAllDataPoints().Select(x => (XYData)x).ToList();
             GenericChart chart_result = GetChart(series);
             traces.Add(chart_result);
-            //CSharp.Chart.Line<double, double, string>(
-            //   x: ,
-            //   y: ,
-            //   Name: series.SeriesName,
-            //   ShowLegend: show_legend,
-            //   ShowMarkers: true)
         }
 
         GenericChart chart = CSharp.Chart.Combine(traces);
@@ -66,6 +64,7 @@ public class ChartGenerator
         {
             ChartDataSeries => GetDataSeriesChart((ChartDataSeries)chart, true),
             ChartFinancialSeries => GetFinancialSeriesChart((ChartFinancialSeries)chart),
+            ChartCategoricalSeries => GetCategoricalSeriesChart((ChartCategoricalSeries)chart),
             _ => throw new NotImplementedException()
         };
 
@@ -96,13 +95,32 @@ public class ChartGenerator
         List<decimal> High = data.Select(x => x.High).ToList();
         List<decimal> Low = data.Select(x => x.Low).ToList();
         List<decimal> Close = data.Select(x => x.Close).ToList();
+        List<decimal> TotalVolume = data.Select(x => x.TotalVolume).ToList();
 
         return chart.ChartType switch
         {
             FinancialSeriesChartType.CandleStick => CSharp.Chart.Candlestick<decimal, DateTime, string>(Open, High, Low, Close, DateTimes, Name: chart.SeriesName, ShowLegend: true),
+            FinancialSeriesChartType.Volume => CSharp.Chart.Histogram<DateTime, decimal, string>(new(DateTimes, true), new(TotalVolume, true), Name: chart.SeriesName + "(Volume)", ShowLegend: true),
             _ => throw new NotImplementedException()
         };
     }
+
+    private static GenericChart GetCategoricalSeriesChart(ChartCategoricalSeries chart)
+    {
+        List<CategoricalData> data = chart.Data.GetAllDataPoints().Cast<CategoricalData>().ToList();
+        List<string> Categories = data.Select(x => x.Category).ToList();
+        List<double> Values = data.Select(x => x.Value).ToList();
+
+        return chart.ChartType switch
+        {
+            CategoricalSeriesChartType.Pie => CSharp.Chart.Pie<double, string, string>(Values, Labels: new(Categories, true), Name: chart.SeriesName),
+            CategoricalSeriesChartType.Donut => CSharp.Chart.Doughnut<double, string, string>(Values, Labels: new(Categories, true), Name: chart.SeriesName),
+            CategoricalSeriesChartType.Column => CSharp.Chart.Column<double, string, string>(Values, Keys: new(Categories, true), Name: chart.SeriesName),
+            CategoricalSeriesChartType.Bar => CSharp.Chart.Bar<double, string, string>(Values, Keys: new(Categories, true), Name: chart.SeriesName),
+            _ => throw new NotImplementedException()
+        };
+    }
+
 
     private static Layout GetDefaultLayout()
     {
