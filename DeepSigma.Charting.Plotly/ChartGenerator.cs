@@ -1,7 +1,9 @@
 ﻿//using DeepSigma.General.Extensions;
 using DeepSigma.Charting;
+using DeepSigma.Charting.Enum;
 using DeepSigma.Charting.Interfaces;
 using DeepSigma.Charting.Models;
+using Microsoft.FSharp.Core;
 using Plotly.NET;
 using Plotly.NET.CSharp;
 using Plotly.NET.LayoutObjects;
@@ -16,26 +18,24 @@ namespace DeepSigma.Charting.Plotl;
 /// </summary>
 public class ChartGenerator
 {
+
     public static void LineChart(Charting.Chart2D chart_config)
     {
         List<IChartSeriesAbstract> all_series = chart_config.Series;
-        Axis2D? x_axis = chart_config.Axes.TryToGetAxis("X");
-        Axis2D? y_axis = chart_config.Axes.TryToGetAxis("Y");
         bool show_legend = chart_config.ShowLegend;
-
-        chart_config.
+  
         List<GenericChart> traces = [];
         foreach (IChartSeriesAbstract series in all_series)
         {
-            
             List<XYData> data = series.Data.GetAllDataPoints().Select(x => (XYData)x).ToList();
-            traces.Add(CSharp.Chart.Line<double, double, string>(
-               x: data.Select(x => x.X),
-               y: data.Select(x => x.Y),
-               Name: series.SeriesName,
-               ShowLegend: show_legend,
-               ShowMarkers: true
-           ));
+            GenericChart chart_result = GetDataSeriesChart((ChartDataSeries)series);
+            traces.Add(chart_result);
+            //CSharp.Chart.Line<double, double, string>(
+            //   x: ,
+            //   y: ,
+            //   Name: series.SeriesName,
+            //   ShowLegend: show_legend,
+            //   ShowMarkers: true)
         }
 
         GenericChart chart = CSharp.Chart.Combine(traces);
@@ -43,11 +43,13 @@ public class ChartGenerator
         chart.WithSize(1200, 600);
         chart.WithLayout(GetDefaultLayout());
 
+        Axis2D? x_axis = chart_config.Axes.TryToGetAxis("X");
+        Axis2D? y_axis = chart_config.Axes.TryToGetAxis("Y");
         CSharp.GenericChartExtensions.WithXAxisStyle<double, double, string>(chart, Title: Plotly.NET.Title.init(x_axis?.Title ?? "x-axis"))
         .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init(y_axis?.Title ?? "y-axis", Side: StyleParam.Side.Left));
 
         // Save to file
-        string path = Path.Combine(@"C:\Users\brend\Downloads\", $"chart-{DateTime.Now:yyyy-MM-dd}-{Guid.NewGuid()}.html");
+        string path = Path.Combine(@"C:\Users\brend\Downloads\", $"Demo Chart - {DateTime.Now:yyyy-MM-dd}-{Guid.NewGuid()}.html");
         File.WriteAllText(path, GetHTMLChartWithBackground(chart));
 
         // Open in default browser
@@ -56,6 +58,23 @@ public class ChartGenerator
             FileName = path,
             UseShellExecute = true
         });
+    }
+
+    private static GenericChart GetDataSeriesChart(ChartDataSeries chart, bool IncludeMarkers = true)
+    {
+        List<XYData> data = chart.Data.GetAllDataPoints().Cast<XYData>().ToList();
+        List<double> X = data.Select(x => x.X).ToList();
+        List<double> Y = data.Select(x => x.Y).ToList();
+
+        return chart.ChartType switch
+        {
+            DataSeriesChartType.Line => CSharp.Chart.Line<double, double, string>(X, Y, Name: chart.SeriesName, ShowMarkers: IncludeMarkers),
+            DataSeriesChartType.Spline => CSharp.Chart.Spline<double, double, string>(X, Y, Name: chart.SeriesName, ShowMarkers: IncludeMarkers),
+            DataSeriesChartType.Area => CSharp.Chart.Area<double, double, string>(X, Y, Name: chart.SeriesName, ShowMarkers: IncludeMarkers),
+            DataSeriesChartType.Scatter => CSharp.Chart.Scatter<double, double, string>(X, Y, StyleParam.Mode.Markers, Name: chart.SeriesName),
+            DataSeriesChartType.Histogram => CSharp.Chart.Column<double, double, string>(Y, Keys: new (X, true), Name: chart.SeriesName),
+            _ => throw new NotImplementedException()
+        };
     }
 
     private static Layout GetDefaultLayout()
