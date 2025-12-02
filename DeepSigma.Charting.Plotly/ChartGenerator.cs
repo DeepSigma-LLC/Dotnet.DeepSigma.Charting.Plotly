@@ -19,7 +19,7 @@ namespace DeepSigma.Charting.Plotl;
 public class ChartGenerator
 {
 
-    public static void LineChart(Charting.Chart2D chart_config)
+    public static void Create(Charting.Chart2D chart_config)
     {
         List<IChartSeriesAbstract> all_series = chart_config.Series;
         bool show_legend = chart_config.ShowLegend;

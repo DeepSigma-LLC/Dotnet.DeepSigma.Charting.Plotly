@@ -36,7 +36,7 @@ public class Tests
         ChartSeriesAbstract chart_series2 = new ChartDataSeries() { ChartType = Enum.DataSeriesChartType.Spline, SeriesName = "RTY", Data = data2 };
         chart.Series.Add(chart_series2);
 
-        ChartGenerator.LineChart(chart);
+        ChartGenerator.Create(chart);
         Assert.True(true);
     }
 }
