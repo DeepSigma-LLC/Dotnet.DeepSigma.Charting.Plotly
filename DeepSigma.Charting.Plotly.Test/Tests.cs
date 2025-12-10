@@ -5,6 +5,9 @@ using DeepSigma.Charting.Enum;
 
 namespace DeepSigma.Charting.Plotly.Test;
 
+/// <summary>
+/// Tests for the ChartGenerator class
+/// </summary>
 public class Tests
 {
     [Fact] public void Test2()
