@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using DeepSigma.Charting.Plotl;
 using DeepSigma.Charting.Models;
+using DeepSigma.Charting.Enum;
 
 namespace DeepSigma.Charting.Plotly.Test;
 
@@ -11,8 +12,8 @@ public class Tests
         Charting.Chart2D chart = new();
         chart.Title = $"Test Chart-{DateTime.Now:yyyy-MM-dd}";
 
-        Axis2D x_axis = new() { Key = "X", Title = "Time", AxisPosition = Enum.Chart2DAxisPosition.Bottom };
-        Axis2D y_axis = new() { Key = "Y", Title = "Value", AxisPosition = Enum.Chart2DAxisPosition.Left }; 
+        Axis2D x_axis = new() { Key = AxisDimension.X, Title = "Time", AxisPosition = Enum.Chart2DAxisPosition.Bottom };
+        Axis2D y_axis = new() { Key = AxisDimension.Y, Title = "Value", AxisPosition = Enum.Chart2DAxisPosition.Left }; 
         chart.Axes.AddAxis(x_axis);
         chart.Axes.AddAxis(y_axis);
 

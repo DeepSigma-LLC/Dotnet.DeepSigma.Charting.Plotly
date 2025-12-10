@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DeepSigma.Charting" Version="1.1.0" />
+    <PackageReference Include="DeepSigma.Charting" Version="1.2.0" />
     <PackageReference Include="Plotly.NET" Version="5.1.0" />
     <PackageReference Include="Plotly.NET.CSharp" Version="0.13.0" />
   </ItemGroup>

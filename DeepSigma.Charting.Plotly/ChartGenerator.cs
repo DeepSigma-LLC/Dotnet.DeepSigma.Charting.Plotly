@@ -41,8 +41,8 @@ public class ChartGenerator
         chart.WithSize(1200, 600);
         chart.WithLayout(GetDefaultLayout());
 
-        Axis2D? x_axis = chart_config.Axes.TryToGetAxis("X");
-        Axis2D? y_axis = chart_config.Axes.TryToGetAxis("Y");
+        Axis2D? x_axis = chart_config.Axes.TryToGetAxis(AxisDimension.X);
+        Axis2D? y_axis = chart_config.Axes.TryToGetAxis(AxisDimension.Y);
         CSharp.GenericChartExtensions.WithXAxisStyle<double, double, string>(chart, Title: Plotly.NET.Title.init(x_axis?.Title ?? "x-axis"))
         .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init(y_axis?.Title ?? "y-axis", Side: StyleParam.Side.Left));
 
