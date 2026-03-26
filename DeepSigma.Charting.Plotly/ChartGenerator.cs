@@ -23,7 +23,8 @@ public class ChartGenerator
     /// Creates and displays a chart based on the provided Chart2D configuration.
     /// </summary>
     /// <param name="chart_config"></param>
-    public static void Create(Charting.Chart2D chart_config)
+    /// <param name="save_path">If save path is null, it will save to the users downloads folder.</param>
+    public static void Create(Charting.Chart2D chart_config, string? save_path = null)
     {
         List<IChartSeriesAbstract> all_series = chart_config.Series;
         bool show_legend = chart_config.ShowLegend;
@@ -47,7 +48,7 @@ public class ChartGenerator
         .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init(y_axis?.Title ?? "y-axis", Side: StyleParam.Side.Left));
 
         // Save to file
-        string path = Path.Combine(@"C:\Users\brend\Downloads\", $"Demo Chart - {DateTime.Now:yyyy-MM-dd}-{Guid.NewGuid()}.html");
+        string path = save_path ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"Demo Chart - {DateTime.Now:yyyy-MM-dd}-{Guid.NewGuid()}.html");
         File.WriteAllText(path, GetHTMLChartWithBackground(chart));
 
         // Open in default browser
