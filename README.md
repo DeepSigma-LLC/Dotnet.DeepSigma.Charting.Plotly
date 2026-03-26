@@ -1,4 +1,4 @@
-# Dotnet.DeepSigma.Charting.Plotly
+# DeepSigma.Charting.Plotly
 
 A C# adapter library that renders `DeepSigma.Charting` models with Plotly.NET.
 
@@ -125,16 +125,6 @@ ChartGenerator.Create(chart);
 5. Writes the output to an HTML file
 6. Opens that HTML file with the system default browser
 
-## Important limitation
-
-The current implementation writes the generated HTML file to a hard-coded Windows path:
-
-```csharp
-C:\Users\brend\Downloads\
-```
-
-That means the library, as currently implemented, is not yet portable across machines or operating systems without modifying the source. A configurable output path would make this much easier to use in other environments.
-
 ## Testing
 
 The repository includes an xUnit test project that constructs a `Chart2D` instance with two series and calls `ChartGenerator.Create(...)` as a smoke test.
@@ -159,16 +149,6 @@ DeepSigma.Charting.Plotly/
 ├── LICENSE
 └── README.md
 ```
-
-## Notes for maintainers
-
-Areas that would improve the package substantially:
-
-- Replace the hard-coded output path with a configurable file path or stream-based export API
-- Add real assertions in tests instead of a basic smoke test
-- Expose save-only and HTML-string generation options separately
-- Add more examples for financial and categorical charts
-- Publish release notes and NuGet installation guidance
 
 ## License
 
